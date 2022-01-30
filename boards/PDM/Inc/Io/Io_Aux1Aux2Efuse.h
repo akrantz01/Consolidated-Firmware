@@ -10,7 +10,7 @@
  * Initialize the Aux1Aux2 efuse.
  * @param spi_handle Handle to the SPI peripheral used for the Efuse
  */
-void Io_Aux1Aux2Efuse_Init(SPI_HandleTypeDef *spi_handle);
+void Io_Aux1Aux2Efuse_Init(uint16_t *spi_handle);
 
 /**
  * Enable the Aux 1 channel output for the Aux1Aux2 efuse.

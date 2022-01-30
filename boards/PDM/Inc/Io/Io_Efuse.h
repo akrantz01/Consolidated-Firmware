@@ -36,19 +36,19 @@ struct Efuse_Context;
 struct Efuse_Context *Io_Efuse_Create(
     float (*get_channel_0_current)(void),
     float (*get_channel_1_current)(void),
-    SPI_HandleTypeDef *spi_handle,
-    GPIO_TypeDef *     nss_port,
-    uint16_t           nss_pin,
-    GPIO_TypeDef *     fsob_port,
-    uint16_t           fsob_pin,
-    GPIO_TypeDef *     fsb_port,
-    uint16_t           fsb_pin,
-    GPIO_TypeDef *     current_sync_port,
-    uint16_t           current_sync_pin,
-    GPIO_TypeDef *     channel_0_port,
-    uint16_t           channel_0_pin,
-    GPIO_TypeDef *     channel_1_port,
-    uint16_t           channel_1_pin);
+    uint16_t *    spi_handle,
+    GPIO_TypeDef *nss_port,
+    uint16_t      nss_pin,
+    GPIO_TypeDef *fsob_port,
+    uint16_t      fsob_pin,
+    GPIO_TypeDef *fsb_port,
+    uint16_t      fsb_pin,
+    GPIO_TypeDef *current_sync_port,
+    uint16_t      current_sync_pin,
+    GPIO_TypeDef *channel_0_port,
+    uint16_t      channel_0_pin,
+    GPIO_TypeDef *channel_1_port,
+    uint16_t      channel_1_pin);
 
 /**
  * Deallocate the memory used by the given efuse.

@@ -9,9 +9,9 @@ struct Efuse_Context
     float (*get_channel_0_current)(void);
     float (*get_channel_1_current)(void);
 
-    SPI_HandleTypeDef *spi_handle;
-    GPIO_TypeDef *     nss_port;
-    uint16_t           nss_pin;
+    uint16_t *    spi_handle;
+    GPIO_TypeDef *nss_port;
+    uint16_t      nss_pin;
 
     GPIO_TypeDef *fsob_port;
     uint16_t      fsob_pin;
@@ -49,10 +49,10 @@ static void Io_Efuse_CalculateParityBit(uint16_t *serial_data_input);
  *         EXIT_CODE_TIMEOUT if the SPI write timed-out
  */
 static ExitCode Io_Efuse_WriteToEfuse(
-    uint16_t *         tx_data,
-    SPI_HandleTypeDef *efuse_spi_handle,
-    GPIO_TypeDef *     nss_port,
-    uint16_t           nss_pin);
+    uint16_t *    tx_data,
+    uint16_t *    efuse_spi_handle,
+    GPIO_TypeDef *nss_port,
+    uint16_t      nss_pin);
 
 /**
  * Read SPI data from efuse in blocking mode
@@ -65,11 +65,11 @@ static ExitCode Io_Efuse_WriteToEfuse(
  *         EXIT_CODE_TIMEOUT if the SPI read timed-out
  */
 static ExitCode Io_Efuse_ReadFromEfuse(
-    uint16_t *         tx_data,
-    uint16_t *         rx_data,
-    SPI_HandleTypeDef *efuse_spi_handle,
-    GPIO_TypeDef *     nss_port,
-    uint16_t           nss_pin);
+    uint16_t *    tx_data,
+    uint16_t *    rx_data,
+    uint16_t *    efuse_spi_handle,
+    GPIO_TypeDef *nss_port,
+    uint16_t      nss_pin);
 
 static void Io_Efuse_CalculateParityBit(uint16_t *serial_data_input)
 {
@@ -92,16 +92,18 @@ static void Io_Efuse_CalculateParityBit(uint16_t *serial_data_input)
 }
 
 static ExitCode Io_Efuse_WriteToEfuse(
-    uint16_t *         tx_data,
-    SPI_HandleTypeDef *efuse_spi_handle,
-    GPIO_TypeDef *     nss_port,
-    uint16_t           nss_pin)
+    uint16_t *    tx_data,
+    uint16_t *    efuse_spi_handle,
+    GPIO_TypeDef *nss_port,
+    uint16_t      nss_pin)
 {
+    UNUSED(tx_data);
+    UNUSED(efuse_spi_handle);
+
     HAL_StatusTypeDef status = HAL_OK;
 
     HAL_GPIO_WritePin(nss_port, nss_pin, GPIO_PIN_RESET);
-    status = HAL_SPI_TransmitReceive(
-        efuse_spi_handle, (uint8_t *)tx_data, (uint8_t *)tx_data, 1U, 100U);
+    status = HAL_OK;
     HAL_GPIO_WritePin(nss_port, nss_pin, GPIO_PIN_SET);
 
     if (status != HAL_OK)
@@ -113,17 +115,19 @@ static ExitCode Io_Efuse_WriteToEfuse(
 }
 
 static ExitCode Io_Efuse_ReadFromEfuse(
-    uint16_t *         tx_data,
-    uint16_t *         rx_data,
-    SPI_HandleTypeDef *efuse_spi_handle,
-    GPIO_TypeDef *     nss_port,
-    uint16_t           nss_pin)
+    uint16_t *    tx_data,
+    uint16_t *    rx_data,
+    uint16_t *    efuse_spi_handle,
+    GPIO_TypeDef *nss_port,
+    uint16_t      nss_pin)
 {
+    UNUSED(rx_data);
+    UNUSED(efuse_spi_handle);
+
     // Send the command stored in tx_data to the status register, to read the
     // data from the register address specified in tx_data
     HAL_GPIO_WritePin(nss_port, nss_pin, GPIO_PIN_RESET);
-    HAL_StatusTypeDef status = HAL_SPI_TransmitReceive(
-        efuse_spi_handle, (uint8_t *)tx_data, (uint8_t *)rx_data, 1U, 100U);
+    HAL_StatusTypeDef status = HAL_OK;
     HAL_GPIO_WritePin(nss_port, nss_pin, GPIO_PIN_SET);
 
     if (status != HAL_OK)
@@ -137,8 +141,7 @@ static ExitCode Io_Efuse_ReadFromEfuse(
     // The data read from the register specified in tx_data is stored in rx_data
     // after the SPI transfer
     HAL_GPIO_WritePin(nss_port, nss_pin, GPIO_PIN_RESET);
-    status = HAL_SPI_TransmitReceive(
-        efuse_spi_handle, (uint8_t *)tx_data, (uint8_t *)rx_data, 1U, 100U);
+    status = HAL_OK;
     HAL_GPIO_WritePin(nss_port, nss_pin, GPIO_PIN_SET);
 
     if (status != HAL_OK)
@@ -152,19 +155,19 @@ static ExitCode Io_Efuse_ReadFromEfuse(
 struct Efuse_Context *Io_Efuse_Create(
     float (*get_channel_0_current)(void),
     float (*get_channel_1_current)(void),
-    SPI_HandleTypeDef *const spi_handle,
-    GPIO_TypeDef *           nss_port,
-    uint16_t                 nss_pin,
-    GPIO_TypeDef *           fsob_port,
-    uint16_t                 fsob_pin,
-    GPIO_TypeDef *           fsb_port,
-    uint16_t                 fsb_pin,
-    GPIO_TypeDef *           current_sync_port,
-    uint16_t                 current_sync_pin,
-    GPIO_TypeDef *           channel_0_port,
-    uint16_t                 channel_0_pin,
-    GPIO_TypeDef *           channel_1_port,
-    uint16_t                 channel_1_pin)
+    uint16_t *const spi_handle,
+    GPIO_TypeDef *  nss_port,
+    uint16_t        nss_pin,
+    GPIO_TypeDef *  fsob_port,
+    uint16_t        fsob_pin,
+    GPIO_TypeDef *  fsb_port,
+    uint16_t        fsb_pin,
+    GPIO_TypeDef *  current_sync_port,
+    uint16_t        current_sync_pin,
+    GPIO_TypeDef *  channel_0_port,
+    uint16_t        channel_0_pin,
+    GPIO_TypeDef *  channel_1_port,
+    uint16_t        channel_1_pin)
 {
     assert(spi_handle != NULL);
 
