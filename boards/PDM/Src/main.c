@@ -74,9 +74,6 @@ IWDG_HandleTypeDef hiwdg;
 osThreadId          TaskCanTxHandle;
 uint32_t            TaskCanTxBuffer[128];
 osStaticThreadDef_t TaskCanTxControlBlock;
-osThreadId          TaskCanRxHandle;
-uint32_t            TaskCanRxBuffer[128];
-osStaticThreadDef_t TaskCanRxControlBlock;
 /* USER CODE BEGIN PV */
 struct PdmWorld *         world;
 struct StateMachine *     state_machine;
@@ -105,7 +102,6 @@ static void MX_ADC1_Init(void);
 static void MX_CAN_Init(void);
 static void MX_IWDG_Init(void);
 void        RunTaskCanTx(void const *argument);
-void        RunTaskCanRx(void const *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -262,12 +258,6 @@ int main(void)
         TaskCanTx, RunTaskCanTx, osPriorityIdle, 0, 128, TaskCanTxBuffer,
         &TaskCanTxControlBlock);
     TaskCanTxHandle = osThreadCreate(osThread(TaskCanTx), NULL);
-
-    /* definition and creation of TaskCanRx */
-    osThreadStaticDef(
-        TaskCanRx, RunTaskCanRx, osPriorityIdle, 0, 128, TaskCanRxBuffer,
-        &TaskCanRxControlBlock);
-    TaskCanRxHandle = osThreadCreate(osThread(TaskCanRx), NULL);
 
     /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
@@ -580,27 +570,6 @@ void RunTaskCanTx(void const *argument)
         Io_SharedCan_TransmitEnqueuedCanTxMessagesFromTask();
     }
     /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_RunTaskCanRx */
-/**
- * @brief Function implementing the TaskCanRx thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_RunTaskCanRx */
-void RunTaskCanRx(void const *argument)
-{
-    /* USER CODE BEGIN RunTaskCanRx */
-    UNUSED(argument);
-
-    for (;;)
-    {
-        struct CanMsg message;
-        Io_SharedCan_DequeueCanRxMessage(&message);
-        Io_CanRx_UpdateRxTableWithMessage(can_rx, &message);
-    }
-    /* USER CODE END RunTaskCanRx */
 }
 
 /**
