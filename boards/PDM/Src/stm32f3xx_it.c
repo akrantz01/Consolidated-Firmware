@@ -163,7 +163,7 @@ void DebugMon_Handler(void)
 /******************************************************************************/
 
 /**
- * @brief This function handles USB high priority or CAN_TX interrupts.
+ * @brief This function handles CAN TX and USB high priority interrupts.
  */
 void USB_HP_CAN_TX_IRQHandler(void)
 {
@@ -177,7 +177,7 @@ void USB_HP_CAN_TX_IRQHandler(void)
 }
 
 /**
- * @brief This function handles USB low priority or CAN_RX0 interrupts.
+ * @brief This function handles CAN RX0 and USB low priority interrupts.
  */
 void USB_LP_CAN_RX0_IRQHandler(void)
 {
