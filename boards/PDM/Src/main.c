@@ -43,7 +43,6 @@
 #include "App_PdmWorld.h"
 #include "App_SharedConstants.h"
 #include "App_SharedStateMachine.h"
-#include "states/App_InitState.h"
 #include "configs/App_CurrentLimits.h"
 #include "configs/App_VoltageLimits.h"
 #include "configs/App_HeartbeatMonitorConfig.h"
@@ -75,10 +74,7 @@ osThreadId          TaskCanTxHandle;
 uint32_t            TaskCanTxBuffer[128];
 osStaticThreadDef_t TaskCanTxControlBlock;
 /* USER CODE BEGIN PV */
-struct PdmWorld *         world;
-struct StateMachine *     state_machine;
 struct PdmCanTxInterface *can_tx;
-struct PdmCanRxInterface *can_rx;
 struct InRangeCheck *     vbat_voltage_in_range_check;
 struct InRangeCheck *     _24v_aux_voltage_in_range_check;
 struct InRangeCheck *     _24v_acc_voltage_in_range_check;
@@ -166,8 +162,6 @@ int main(void)
         Io_CanTx_EnqueueNonPeriodicMsg_PDM_STARTUP,
         Io_CanTx_EnqueueNonPeriodicMsg_PDM_WATCHDOG_TIMEOUT);
 
-    can_rx = App_CanRx_Create();
-
     vbat_voltage_in_range_check = App_InRangeCheck_Create(
         Io_VoltageSense_GetVbatVoltage, VBAT_MIN_VOLTAGE, VBAT_MAX_VOLTAGE);
 
@@ -216,18 +210,6 @@ int main(void)
         App_LowVoltageBattery_Create(Io_LT3650_HasFault, Io_LTC3786_HasFault);
 
     clock = App_SharedClock_Create();
-
-    world = App_PdmWorld_Create(
-        can_tx, can_rx, vbat_voltage_in_range_check,
-        _24v_aux_voltage_in_range_check, _24v_acc_voltage_in_range_check,
-        aux1_current_in_range_check, aux2_current_in_range_check,
-        left_inverter_current_in_range_check,
-        right_inverter_current_in_range_check,
-        energy_meter_current_in_range_check, can_current_in_range_check,
-        air_shutdown_current_in_range_check, heartbeat_monitor,
-        rgb_led_sequence, low_voltage_battery, clock);
-
-    state_machine = App_SharedStateMachine_Create(world, App_GetInitState());
 
     Io_SoftwareWatchdog_Init(can_tx);
     Io_StackWaterMark_Init(can_tx);
